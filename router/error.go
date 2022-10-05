@@ -79,14 +79,14 @@ func (e *RequestError) AbortWithStatus(status int, c *gin.Context) {
 	// the error anywhere, just return a 404 and move on with our lives.
 	if errors.Is(e.err, os.ErrNotExist) {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-			"error": "The requested resource was not found on the system.",
+			"error": "在系统上找不到请求的资源。",
 		})
 		return
 	}
 
 	if strings.HasPrefix(e.err.Error(), "invalid URL escape") {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Some of the data provided in the request appears to be escaped improperly.",
+			"error": "请求中提供的某些数据似乎未正确转义。",
 		})
 		return
 	}
@@ -107,7 +107,7 @@ func (e *RequestError) AbortWithStatus(status int, c *gin.Context) {
 	}
 
 	if e.message == "" {
-		e.message = "An unexpected error was encountered while processing this request."
+		e.message = "处理此请求时遇到意外错误。"
 	}
 
 	c.AbortWithStatusJSON(status, gin.H{"error": e.message, "error_id": e.uuid})
@@ -126,22 +126,22 @@ func (e *RequestError) getAsFilesystemError() (int, string) {
 	// which ends up just unleashing chaos on the system. For the sake of this
 	// fallback to using text checks...
 	if filesystem.IsErrorCode(e.err, filesystem.ErrCodeDenylistFile) || strings.Contains(e.err.Error(), "filesystem: file access prohibited") {
-		return http.StatusForbidden, "This file cannot be modified: present in egg denylist."
+		return http.StatusForbidden, "此文件无法修改：出现在预设拒绝名单中。"
 	}
 	if filesystem.IsErrorCode(e.err, filesystem.ErrCodePathResolution) || strings.Contains(e.err.Error(), "resolves to a location outside the server root") {
-		return http.StatusNotFound, "The requested resource was not found on the system."
+		return http.StatusNotFound, "在系统上找不到请求的资源。"
 	}
 	if filesystem.IsErrorCode(e.err, filesystem.ErrCodeIsDirectory) || strings.Contains(e.err.Error(), "filesystem: is a directory") {
-		return http.StatusBadRequest, "Cannot perform that action: file is a directory."
+		return http.StatusBadRequest, "无法执行该操作：文件是目录。"
 	}
 	if filesystem.IsErrorCode(e.err, filesystem.ErrCodeDiskSpace) || strings.Contains(e.err.Error(), "filesystem: not enough disk space") {
-		return http.StatusBadRequest, "Cannot perform that action: not enough disk space available."
+		return http.StatusBadRequest, "无法执行该操作：可用的存储空间不足。"
 	}
 	if strings.HasSuffix(e.err.Error(), "file name too long") {
-		return http.StatusBadRequest, "Cannot perform that action: file name is too long."
+		return http.StatusBadRequest, "无法执行该操作：文件名太长。"
 	}
 	if e, ok := e.err.(*os.SyscallError); ok && e.Syscall == "readdirent" {
-		return http.StatusNotFound, "The requested directory does not exist."
+		return http.StatusNotFound, "请求的目录不存在。"
 	}
 	return 0, ""
 }

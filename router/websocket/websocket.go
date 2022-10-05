@@ -252,7 +252,7 @@ func (h *Handler) SendErrorJson(msg Message, err error, shouldLog ...bool) error
 func (h *Handler) GetErrorMessage(msg string) (string, uuid.UUID) {
 	u := uuid.Must(uuid.NewRandom())
 
-	m := fmt.Sprintf("Error Event [%s]: %s", u.String(), msg)
+	m := fmt.Sprintf("错误事件 [%s]: %s", u.String(), msg)
 
 	return m, u
 }
