@@ -17,6 +17,8 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/mholt/archiver/v3"
+
+	"golang.org/x/text/encoding/simplifiedchinese"
 )
 
 // CompressFiles compresses all of the files matching the given paths in the
@@ -174,18 +176,25 @@ func ExtractNameFromArchive(f archiver.File) string {
 	if sys == nil {
 		return f.Name()
 	}
+	str := f.Name()
 	switch s := sys.(type) {
 	case *zip.FileHeader:
-		return s.Name
+		str = s.Name
+		break
 	case *zip2.FileHeader:
-		return s.Name
+		str = s.Name
+		break
 	case *tar.Header:
-		return s.Name
+		str = s.Name
+		break
 	case *gzip.Header:
-		return s.Name
+		str = s.Name
+		break
 	case *gzip2.Header:
-		return s.Name
+		str = s.Name
+		break
 	default:
+		str = f.Name()
 		// At this point we cannot figure out what type of archive this might be so
 		// just try to find the name field in the struct. If it is found return it.
 		field := reflect.Indirect(reflect.ValueOf(sys)).FieldByName("Name")
@@ -196,5 +205,35 @@ func ExtractNameFromArchive(f archiver.File) string {
 		// do to try and figure out what the underlying directory of the file is supposed to
 		// be since it didn't implement a name field.
 		return f.Name()
+	}
+	// 判断
+	length := len(str)
+    var i int = 0
+	var ifgbk bool
+    for i < length {
+        if str[i] <= 0x7f {
+            //编码0~127,只有一个字节的编码，兼容ASCII码
+            i++
+            ifgbk = true
+        } else {
+            //大于127的使用双字节编码，落在gbk编码范围内的字符
+            if  str[i] >= 0x81 &&
+                str[i] <= 0xfe &&
+                str[i + 1] >= 0x40 &&
+                str[i + 1] <= 0xfe &&
+                str[i + 1] != 0xf7 {
+                i += 2
+                ifgbk = true
+            } else {
+                ifgbk = false
+            }
+        }
+    }
+	// 转换
+	if ifgbk == true {
+		utf8Str, _ := simplifiedchinese.GBK.NewDecoder().Bytes([]byte(str))
+		return string(utf8Str)
+	} else {
+		return string(str)
 	}
 }
