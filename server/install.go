@@ -18,6 +18,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
+
 	"github.com/pterodactyl/wings/config"
 	"github.com/pterodactyl/wings/environment"
 	"github.com/pterodactyl/wings/remote"
@@ -449,7 +450,7 @@ func (ip *InstallationProcess) Execute() (string, error) {
 		},
 		Privileged:  true,
 		NetworkMode: container.NetworkMode(config.Get().Docker.Network.Mode),
-		UsernsMode: container.UsernsMode(config.Get().Docker.UsernsMode),
+		UsernsMode:  container.UsernsMode(config.Get().Docker.UsernsMode),
 	}
 
 	// Ensure the root directory for the server exists properly before attempting
