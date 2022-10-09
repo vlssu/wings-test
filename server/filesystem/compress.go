@@ -235,6 +235,6 @@ func ExtractNameFromArchive(f archiver.File) string {
 		utf8Str, _ := simplifiedchinese.GBK.NewDecoder().Bytes([]byte(str))
 		return string(utf8Str)
 	} else {
-		return string(str)
+		return str
 	}
 }
