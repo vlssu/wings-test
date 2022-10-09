@@ -17,6 +17,8 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/mholt/archiver/v3"
+
+	"golang.org/x/text/encoding/simplifiedchinese"
 )
 
 // CompressFiles compresses all of the files matching the given paths in the
@@ -174,17 +176,18 @@ func ExtractNameFromArchive(f archiver.File) string {
 	if sys == nil {
 		return f.Name()
 	}
+	str := f.Name()
 	switch s := sys.(type) {
 	case *zip.FileHeader:
-		return s.Name
+		str =  s.Name
 	case *zip2.FileHeader:
-		return s.Name
+		str =  s.Name
 	case *tar.Header:
-		return s.Name
+		str =  s.Name
 	case *gzip.Header:
-		return s.Name
+		str =  s.Name
 	case *gzip2.Header:
-		return s.Name
+		str =  s.Name
 	default:
 		// At this point we cannot figure out what type of archive this might be so
 		// just try to find the name field in the struct. If it is found return it.
@@ -195,6 +198,18 @@ func ExtractNameFromArchive(f archiver.File) string {
 		// Fallback to the basename of the file at this point. There is nothing we can really
 		// do to try and figure out what the underlying directory of the file is supposed to
 		// be since it didn't implement a name field.
-		return f.Name()
+		str = f.Name()
+	}
+	isNonUTF8 := false
+	utf8Field := reflect.Indirect(reflect.ValueOf(sys)).FieldByName("NonUTF8")
+	if utf8Field.IsValid() {
+		isNonUTF8 = utf8Field.Bool()
+	}
+	// 转换
+	if isNonUTF8 {
+		utf8Str, _ := simplifiedchinese.GBK.NewDecoder().Bytes([]byte(str))
+		return string(utf8Str)
+	} else {
+		return str
 	}
 }
