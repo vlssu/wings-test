@@ -22,7 +22,7 @@ Wings 是 Pterodactyl 的服务器控制层，专为快速变化的游戏行业�
 * [Panel 文档](https://pterodactyl.top/panel/1.0/getting_started.html)
 * [Wings 文档](https://pterodactyl.top/wings/1.0/installing.html)
 * [社区指南文档](https://pterodactyl.top/community/about.html)
-* 或者，[通过 KOOK](https://kook.top/0Grsf5) 获得更多帮助
+* 或者，[通过 KOOK](https://kook.top/0Grsf5) 或 [通过 翼龙中国社区](https://bbs.pterodactyl.top) 来获得更多帮助
 
 ## 报告问题
 请在翼龙官方 [pterodactyl/panel](https://github.com/pterodactyl/panel) 仓库来报告 Wings 的任何问题或提出功能请求。此外，该仓库中列出的 [安全策略](https://github.com/pterodactyl/panel/security/policy) 也适用于 Wings。
