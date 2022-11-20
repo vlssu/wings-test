@@ -7,12 +7,12 @@ require (
 	github.com/AlecAivazis/survey/v2 v2.3.6
 	github.com/Jeffail/gabs/v2 v2.6.1
 	github.com/NYTimes/logrotate v1.0.0
+	github.com/acobaugh/osrelease v0.1.0
 	github.com/apex/log v1.9.0
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/beevik/etree v1.1.0
 	github.com/buger/jsonparser v1.1.1
 	github.com/cenkalti/backoff/v4 v4.1.3
-	github.com/cobaugh/osrelease v0.0.0-20181218015638-a93a0a55a249
 	github.com/creasty/defaults v1.6.0
 	github.com/docker/docker v20.10.18+incompatible
 	github.com/docker/go-connections v0.4.0
@@ -35,7 +35,7 @@ require (
 	github.com/klauspost/pgzip v1.2.5
 	github.com/magiconair/properties v1.8.6
 	github.com/mattn/go-colorable v0.1.13
-	github.com/mholt/archiver/v3 v3.5.1
+	github.com/mholt/archiver/v4 v4.0.0-alpha.7
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/sftp v1.13.5
@@ -88,7 +88,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
-	github.com/nwaples/rardecode v1.1.3 // indirect
+	github.com/nwaples/rardecode/v2 v2.0.0-beta.2 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0-rc2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
@@ -103,9 +103,9 @@ require (
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/therootcompany/xz v1.0.1 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/ulikunitz/xz v0.5.10 // indirect
-	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
