@@ -20,6 +20,8 @@ import (
 	gzip2 "github.com/klauspost/compress/gzip"
 	zip2 "github.com/klauspost/compress/zip"
 	"github.com/mholt/archiver/v4"
+	
+	"golang.org/x/text/encoding/simplifiedchinese"
 )
 
 // CompressFiles compresses all the files matching the given paths in the
