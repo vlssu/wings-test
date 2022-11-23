@@ -20,12 +20,28 @@ import (
 func getSystemInformation(c *gin.Context) {
 	i, err := system.GetSystemInformation()
 	if err != nil {
-		NewTrackedError(err).Abort(c)
-
+		middleware.CaptureAndAbort(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, i)
+	if c.Query("v") == "2" {
+		c.JSON(http.StatusOK, i)
+		return
+	}
+
+	c.JSON(http.StatusOK, struct {
+		Architecture  string `json:"architecture"`
+		CPUCount      int    `json:"cpu_count"`
+		KernelVersion string `json:"kernel_version"`
+		OS            string `json:"os"`
+		Version       string `json:"version"`
+	}{
+		Architecture:  i.System.Architecture,
+		CPUCount:      i.System.CPUThreads,
+		KernelVersion: i.System.KernelVersion,
+		OS:            i.System.OSType,
+		Version:       i.Version,
+	})
 }
 
 // Returns all the servers that are registered and configured correctly on
@@ -75,7 +91,7 @@ func postCreateServer(c *gin.Context) {
 			return
 		}
 
-		if err := i.Server().Install(false); err != nil {
+		if err := i.Server().Install(); err != nil {
 			log.WithFields(log.Fields{"server": i.Server().ID(), "error": err}).Error("failed to run install process for server")
 			return
 		}
@@ -117,7 +133,7 @@ func postUpdateConfiguration(c *gin.Context) {
 	// Try to write this new configuration to the disk before updating our global
 	// state with it.
 	if err := config.WriteToDisk(cfg); err != nil {
-		_ = WithError(c, err)
+		middleware.CaptureAndAbort(c, err)
 		return
 	}
 	// Since we wrote it to the disk successfully now update the global configuration
