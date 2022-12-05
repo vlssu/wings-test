@@ -4,8 +4,9 @@ on:
   push:
     branches:
       - develop
-    tags:
-      - "v*"
+  release:
+    types:
+      - published
 
 jobs:
   build-and-push:
@@ -13,20 +14,26 @@ jobs:
     runs-on: ubuntu-20.04
     # Always run against a tag, even if the commit into the tag has [docker skip] within the commit message.
     if: "!contains(github.ref, 'develop') || (!contains(github.event.head_commit.message, 'skip docker') && !contains(github.event.head_commit.message, 'docker skip'))"
-
     steps:
-      - name: Code Checkout
+      - name: Code checkout
         uses: actions/checkout@v3
 
-      - name: Docker Meta
+      - name: Docker metadata
         id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1
+        uses: docker/metadata-action@v4
         with:
           images: ghcr.io/pterodactyl-china/wings
-      - name: Set up QEMU
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=latest,enable=${{ github.event_name == 'release' && github.event.action == 'published' && github.event.release.prerelease == false }}
+            type=ref,event=tag
+            type=ref,event=branch
+
+      - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
 
-      - name: Install buildx
+      - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v2
 
       - name: Login to GitHub Container Registry
@@ -39,12 +46,12 @@ jobs:
       - name: Get Build Information
         id: build_info
         run: |
-          echo "::set-output name=version_tag::${GITHUB_REF/refs\/tags\/v/}"
-          echo "::set-output name=short_sha::$(git rev-parse --short HEAD)"
+          echo "version_tag=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_OUTPUT
+          echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-      - name: Build and push (latest)
-        uses: docker/build-push-action@v2
-        if: "!contains(github.ref, 'develop')"
+      - name: Build and Push (tag)
+        uses: docker/build-push-action@v3
+        if: "github.event_name == 'release' && github.event.action == 'published'"
         with:
           context: .
           file: ./Dockerfile
@@ -55,9 +62,9 @@ jobs:
           labels: ${{ steps.docker_meta.outputs.labels }}
           tags: ${{ steps.docker_meta.outputs.tags }}
 
-      - name: Build and push (develop)
-        uses: docker/build-push-action@v2
-        if: "contains(github.ref, 'develop')"
+      - name: Build and Push (develop)
+        uses: docker/build-push-action@v3
+        if: "github.event_name == 'push' && contains(github.ref, 'develop')"
         with:
           context: .
           file: ./Dockerfile
