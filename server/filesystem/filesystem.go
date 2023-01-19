@@ -92,6 +92,9 @@ func (fs *Filesystem) Touch(p string, flag int) (*os.File, error) {
 	if err == nil {
 		return f, nil
 	}
+	if f != nil {
+		_ = f.Close()
+	}
 	// If the error is not because it doesn't exist then we just need to bail at this point.
 	if !errors.Is(err, os.ErrNotExist) {
 		return nil, errors.Wrap(err, "server/filesystem: touch: failed to open file handle")
