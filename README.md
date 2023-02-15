@@ -28,3 +28,5 @@ Wings 是 Pterodactyl 的服务器控制层，专为快速变化的游戏行业�
 请在翼龙官方 [pterodactyl/panel](https://github.com/pterodactyl/panel) 仓库来报告 Wings 的任何问题或提出功能请求。此外，该仓库中列出的 [安全策略](https://github.com/pterodactyl/panel/security/policy) 也适用于 Wings。
 
 翼龙中国不接受非汉化修复的一类问题
+
+> "翼龙中国" 不隶属于 pterodactyl,"翼龙中国" 为 pterodactyl 第三方分支
