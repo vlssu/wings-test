@@ -105,7 +105,7 @@ func putServerRenameFiles(c *gin.Context) {
 
 	if len(data.Files) == 0 {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
-			"error": "No files to move or rename were provided.",
+			"error": "没有提供要移动或重命名的文件。",
 		})
 		return
 	}
@@ -134,7 +134,7 @@ func putServerRenameFiles(c *gin.Context) {
 						s.Log().WithField("error", err).
 							WithField("from_path", pf).
 							WithField("to_path", pt).
-							Warn("failed to rename: source or target does not exist")
+							Warn("重命名失败：源或目标不存在")
 						return nil
 					}
 					return err
@@ -147,7 +147,7 @@ func putServerRenameFiles(c *gin.Context) {
 	if err := g.Wait(); err != nil {
 		if errors.Is(err, os.ErrExist) {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"error": "Cannot move or rename file, destination already exists.",
+				"error": "无法移动或重命名文件，目标已存在。",
 			})
 			return
 		}
@@ -198,7 +198,7 @@ func postServerDeleteFiles(c *gin.Context) {
 
 	if len(data.Files) == 0 {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
-			"error": "No files were specified for deletion.",
+			"error": "没有指定要删除的文件。",
 		})
 		return
 	}
@@ -242,7 +242,7 @@ func postServerWriteFile(c *gin.Context) {
 	if err := s.Filesystem().Writefile(f, c.Request.Body); err != nil {
 		if filesystem.IsErrorCode(err, filesystem.ErrCodeIsDirectory) {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"error": "Cannot write file, name conflicts with an existing directory by the same name.",
+				"error": "无法写入文件，名称与现有目录的名称存在冲突。",
 			})
 			return
 		}
@@ -290,7 +290,7 @@ func postServerPullRemoteFile(c *gin.Context) {
 	if err != nil {
 		if e, ok := err.(*url.Error); ok {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"error": "An error occurred while parsing that URL: " + e.Err.Error(),
+				"error": "解析该 URL 时发生错误: " + e.Err.Error(),
 			})
 			return
 		}
@@ -305,7 +305,7 @@ func postServerPullRemoteFile(c *gin.Context) {
 	// Do not allow more than three simultaneous remote file downloads at one time.
 	if len(downloader.ByServer(s.ID())) >= 3 {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "This server has reached its limit of 3 simultaneous remote file downloads at once. Please wait for one to complete before trying again.",
+			"error": "该服务器已达到同时下载 3 个远程文件的限制。 请等待现有任务完成后再次重试。",
 		})
 		return
 	}
