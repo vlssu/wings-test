@@ -190,7 +190,7 @@ func (s *Server) onBeforeStart() error {
 	if s.DiskSpace() <= 0 {
 		s.Filesystem().HasSpaceAvailable(true)
 	} else {
-		s.PublishConsoleOutputFromDaemon("Checking server disk space usage, this could take a few seconds...")
+		s.PublishConsoleOutputFromDaemon("正在检查服务器磁盘空间使用情况，这可能需要几秒钟...")
 		if err := s.Filesystem().HasSpaceErr(false); err != nil {
 			return err
 		}
@@ -201,13 +201,13 @@ func (s *Server) onBeforeStart() error {
 	// is complete. Any errors as a result of this will just be bubbled out in the logger,
 	// we don't need to actively do anything about it at this point, worse comes to worst the
 	// server starts in a weird state and the user can manually adjust.
-	s.PublishConsoleOutputFromDaemon("Updating process configuration files...")
+	s.PublishConsoleOutputFromDaemon("正在更新进程配置文件...")
 	s.Log().Debug("updating server configuration files...")
 	s.UpdateConfigurationFiles()
 	s.Log().Debug("updated server configuration files")
 
 	if config.Get().System.CheckPermissionsOnBoot {
-		s.PublishConsoleOutputFromDaemon("Ensuring file permissions are set correctly, this could take a few seconds...")
+		s.PublishConsoleOutputFromDaemon("确保文件权限设置正确，这可能需要几秒钟...")
 		// Ensure all the server file permissions are set correctly before booting the process.
 		s.Log().Debug("chowning server root directory...")
 		if err := s.Filesystem().Chown("/"); err != nil {
@@ -215,6 +215,6 @@ func (s *Server) onBeforeStart() error {
 		}
 	}
 
-	s.Log().Info("completed server preflight, starting boot process...")
+	s.Log().Info("已完成服务器预检，开始启动进程...")
 	return nil
 }

@@ -129,9 +129,9 @@ func (s *Server) StartEventListeners() {
 					case environment.DockerImagePullStatus:
 						s.Events().Publish(InstallOutputEvent, e.Data)
 					case environment.DockerImagePullStarted:
-						s.PublishConsoleOutputFromDaemon("Pulling Docker container image, this could take a few minutes to complete...")
+						s.PublishConsoleOutputFromDaemon("正在拉取 Docker 容器镜像，这可能需要几分钟才能完成...")
 					case environment.DockerImagePullCompleted:
-						s.PublishConsoleOutputFromDaemon("Finished pulling Docker container image")
+						s.PublishConsoleOutputFromDaemon("Docker 容器镜像已拉取完成")
 					default:
 					}
 				}(v, limit)
