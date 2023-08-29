@@ -422,7 +422,7 @@ func initLogging() {
 func printLogo() {
 	fmt.Printf(colorstring.Color(`
                      ____
-__ [blue][bold]Pterodactyl-China[reset] _____/___/_______ _______ ______
+__ [blue][bold]Pterodactyl[reset] _____/___/_______ _______ ______
 \_____\    \/\/    /   /       /  __   /   ___/
    \___\          /   /   /   /  /_/  /___   /
         \___/\___/___/___/___/___    /______/
