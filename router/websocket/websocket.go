@@ -362,7 +362,7 @@ func (h *Handler) HandleInbound(ctx context.Context, m Message) error {
 
 			err := h.server.HandlePowerAction(action)
 			if errors.Is(err, system.ErrLockerLocked) {
-				m, _ := h.GetErrorMessage("another power action is currently being processed for this server, please try again later")
+				m, _ := h.GetErrorMessage("当前正在为此服务器处理另一个电源操作，请稍后重试")
 
 				_ = h.SendJson(Message{
 					Event: ErrorEvent,

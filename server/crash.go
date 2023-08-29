@@ -50,8 +50,8 @@ func (s *Server) handleServerCrash() error {
 	// disabled we want to skip anything after this as well.
 	if s.Environment.State() != environment.ProcessOfflineState || !s.Config().CrashDetectionEnabled {
 		if !s.Config().CrashDetectionEnabled {
-			s.Log().Debug("server triggered crash detection but handler is disabled for server process")
-			s.PublishConsoleOutputFromDaemon("Aborting automatic restart, crash detection is disabled for this instance.")
+			s.Log().Debug("服务器触发了崩溃检测，但处理程序已禁用服务器进程")
+			s.PublishConsoleOutputFromDaemon("中止自动重启，此实例禁用崩溃检测。")
 		}
 
 		return nil
@@ -59,19 +59,19 @@ func (s *Server) handleServerCrash() error {
 
 	exitCode, oomKilled, err := s.Environment.ExitState()
 	if err != nil {
-		return errors.Wrap(err, "failed to get exit state for server process")
+		return errors.Wrap(err, "无法获取服务器进程的退出状态")
 	}
 
 	// If the system is not configured to detect a clean exit code as a crash, and the
 	// crash is not the result of the program running out of memory, do nothing.
 	if exitCode == 0 && !oomKilled && !config.Get().System.CrashDetection.DetectCleanExitAsCrash {
-		s.Log().Debug("server exited with successful exit code; system is configured to not detect this as a crash")
+		s.Log().Debug("服务器退出并成功退出代码;系统配置为不将其检测为崩溃")
 		return nil
 	}
 
-	s.PublishConsoleOutputFromDaemon("---------- Detected server process in a crashed state! ----------")
-	s.PublishConsoleOutputFromDaemon(fmt.Sprintf("Exit code: %d", exitCode))
-	s.PublishConsoleOutputFromDaemon(fmt.Sprintf("Out of memory: %t", oomKilled))
+	s.PublishConsoleOutputFromDaemon("---------- 检测到服务器进程处于崩溃状态！ ----------")
+	s.PublishConsoleOutputFromDaemon(fmt.Sprintf("退出代码: %d", exitCode))
+	s.PublishConsoleOutputFromDaemon(fmt.Sprintf("内存不足: %t", oomKilled))
 
 	c := s.crasher.LastCrashTime()
 	timeout := config.Get().System.CrashDetection.Timeout
@@ -81,11 +81,11 @@ func (s *Server) handleServerCrash() error {
 	//
 	// If timeout is set to 0, always reboot the server (this is probably a terrible idea, but some people want it)
 	if timeout != 0 && !c.IsZero() && c.Add(time.Second*time.Duration(config.Get().System.CrashDetection.Timeout)).After(time.Now()) {
-		s.PublishConsoleOutputFromDaemon("Aborting automatic restart, last crash occurred less than " + strconv.Itoa(timeout) + " seconds ago.")
+		s.PublishConsoleOutputFromDaemon("正在中止自动重启，上次崩溃发生在 " + strconv.Itoa(timeout) + " 秒内。")
 		return &crashTooFrequent{}
 	}
 
 	s.crasher.SetLastCrash(time.Now())
 
-	return errors.Wrap(s.HandlePowerAction(PowerActionStart), "failed to start server after crash detection")
+	return errors.Wrap(s.HandlePowerAction(PowerActionStart), "检测到崩溃后无法启动服务器")
 }
