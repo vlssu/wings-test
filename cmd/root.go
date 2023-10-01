@@ -432,7 +432,7 @@ __ [blue][bold]Pterodactyl[reset] _____/___/_______ _______ ______
 
 网站:  https://pterodactyl.top
 来源:  https://github.com/pterodactyl-china/wings
-许可:  https://github.com/pterodactyl-china/wings/blob/develop/LICENSE
+许可:  https://github.com/pterodactyl/wings/blob/develop/LICENSE
 
 该软件根据 MIT 许可条款提供。
 上述版权声明和许可声明包含在软件的所有副本或重要部分中。%s`), system.Version, time.Now().Year(), "\n\n")
