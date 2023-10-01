@@ -32,7 +32,7 @@ var nodeIdRegex = regexp.MustCompile(`^(\d+)$`)
 
 var configureCmd = &cobra.Command{
 	Use:   "configure",
-	Short: "Use a token to configure wings automatically",
+	Short: "使用令牌自动配置 wings",
 	Run:   configureCmdRun,
 }
 
@@ -53,9 +53,9 @@ func configureCmdRun(cmd *cobra.Command, args []string) {
 	}
 
 	if _, err := os.Stat(configureArgs.ConfigPath); err == nil && !configureArgs.Override {
-		survey.AskOne(&survey.Confirm{Message: "Override existing configuration file"}, &configureArgs.Override)
+		survey.AskOne(&survey.Confirm{Message: "覆盖现有配置文件"}, &configureArgs.Override)
 		if !configureArgs.Override {
-			fmt.Println("Aborting process; a configuration file already exists for this node.")
+			fmt.Println("正在中止进程；该节点的配置文件已存在。")
 			os.Exit(1)
 		}
 	} else if err != nil && !os.IsNotExist(err) {
@@ -84,7 +84,7 @@ func configureCmdRun(cmd *cobra.Command, args []string) {
 			Validate: func(ans interface{}) error {
 				if str, ok := ans.(string); ok {
 					if len(str) == 0 {
-						return fmt.Errorf("please provide a valid authentication token")
+						return fmt.Errorf("请提供有效的身份验证令牌")
 					}
 				}
 				return nil
@@ -99,7 +99,7 @@ func configureCmdRun(cmd *cobra.Command, args []string) {
 			Validate: func(ans interface{}) error {
 				if str, ok := ans.(string); ok {
 					if !nodeIdRegex.Match([]byte(str)) {
-						return fmt.Errorf("please provide a valid authentication token")
+						return fmt.Errorf("请提供有效的身份验证令牌")
 					}
 				}
 				return nil
@@ -129,18 +129,18 @@ func configureCmdRun(cmd *cobra.Command, args []string) {
 
 	res, err := c.Do(req)
 	if err != nil {
-		fmt.Println("Failed to fetch configuration from the panel.\n", err.Error())
+		fmt.Println("无法从面板获取配置。\n", err.Error())
 		os.Exit(1)
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode == http.StatusForbidden || res.StatusCode == http.StatusUnauthorized {
-		fmt.Println("The authentication credentials provided were not valid.")
+		fmt.Println("提供的身份验证凭据无效。")
 		os.Exit(1)
 	} else if res.StatusCode != http.StatusOK {
 		b, _ := io.ReadAll(res.Body)
 
-		fmt.Println("An error occurred while processing this request.\n", string(b))
+		fmt.Println("处理此请求时发生错误。\n", string(b))
 		os.Exit(1)
 	}
 
@@ -159,7 +159,7 @@ func configureCmdRun(cmd *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	fmt.Println("Successfully configured wings.")
+	fmt.Println("wings 配置成功。")
 }
 
 func getRequest() (*http.Request, error) {

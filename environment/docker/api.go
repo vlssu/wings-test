@@ -116,5 +116,5 @@ func parseErrorFromResponse(res *http.Response, body []byte) error {
 		emsg = strings.TrimSpace(string(body))
 	}
 
-	return errors.Wrap(errors.New(emsg), "Error response from daemon")
+	return errors.Wrap(errors.New(emsg), "来自守护进程的错误响应")
 }

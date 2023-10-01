@@ -318,15 +318,15 @@ func (s *Server) OnStateChange() {
 	// separate thread as to not block any actions currently taking place in the flow
 	// that called this function.
 	if (prevState == environment.ProcessStartingState || prevState == environment.ProcessRunningState) && s.Environment.State() == environment.ProcessOfflineState {
-		s.Log().Info("detected server as entering a crashed state; running crash handler")
+		s.Log().Info("检测到服务器进入崩溃状态；正在运行崩溃处理程序")
 
 		go func(server *Server) {
 			if err := server.handleServerCrash(); err != nil {
 				if IsTooFrequentCrashError(err) {
-					server.Log().Info("did not restart server after crash; occurred too soon after the last")
+					server.Log().Info("崩溃后没有重新启动服务器；距离上次重启速度太快")
 				} else {
-					s.PublishConsoleOutputFromDaemon("Server crash was detected but an error occurred while handling it.")
-					server.Log().WithField("error", err).Error("failed to handle server crash")
+					s.PublishConsoleOutputFromDaemon("检测到服务器崩溃，但处理过程中发生错误。")
+					server.Log().WithField("错误", err).Error("无法处理服务器崩溃")
 				}
 			}
 		}(s)

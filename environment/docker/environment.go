@@ -161,7 +161,7 @@ func (e *Environment) ExitState() (uint32, bool, error) {
 		if client.IsErrNotFound(err) {
 			return 1, false, nil
 		}
-		return 0, false, errors.WrapIf(err, "environment/docker: failed to inspect container")
+		return 0, false, errors.WrapIf(err, "environment/docker: 无法检查容器")
 	}
 	return uint32(c.State.ExitCode), c.State.OOMKilled, nil
 }
@@ -201,7 +201,7 @@ func (e *Environment) SetState(state string) {
 		state != environment.ProcessStartingState &&
 		state != environment.ProcessRunningState &&
 		state != environment.ProcessStoppingState {
-		panic(errors.New(fmt.Sprintf("invalid server state received: %s", state)))
+		panic(errors.New(fmt.Sprintf("收到无效的服务器状态: %s", state)))
 	}
 
 	// Emit the event to any listeners that are currently registered.

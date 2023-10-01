@@ -231,13 +231,13 @@ func uploadToHastebin(hbUrl, content string) (string, error) {
 	u.Path = path.Join(u.Path, "documents")
 	res, err := http.Post(u.String(), "plain/text", r)
 	if err != nil || res.StatusCode != 200 {
-		fmt.Println("Failed to upload report to ", u.String(), err)
+		fmt.Println("无法将报告上传至 ", u.String(), err)
 		return "", err
 	}
 	pres := make(map[string]interface{})
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		fmt.Println("Failed to parse response.", err)
+		fmt.Println("无法解析响应。", err)
 		return "", err
 	}
 	json.Unmarshal(body, &pres)
@@ -246,7 +246,7 @@ func uploadToHastebin(hbUrl, content string) (string, error) {
 		u.Path = path.Join(u.Path, key)
 		return u.String(), nil
 	}
-	return "", errors.New("failed to find key in response")
+	return "", errors.New("未能找到响应的密钥")
 }
 
 func redact(s string) string {

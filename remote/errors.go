@@ -49,7 +49,7 @@ func (re *RequestError) Error() string {
 		c = re.response.StatusCode
 	}
 
-	return fmt.Sprintf("Error response from Panel: %s: %s (HTTP/%d)", re.Code, re.Detail, c)
+	return fmt.Sprintf("来自面板的错误响应: %s: %s (HTTP/%d)", re.Code, re.Detail, c)
 }
 
 // StatusCode returns the status code of the response.
@@ -60,5 +60,5 @@ func (re *RequestError) StatusCode() int {
 type SftpInvalidCredentialsError struct{}
 
 func (ice SftpInvalidCredentialsError) Error() string {
-	return "the credentials provided were invalid"
+	return "提供的凭据无效"
 }
