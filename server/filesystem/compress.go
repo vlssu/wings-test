@@ -230,6 +230,12 @@ func (fs *Filesystem) extractStream(ctx context.Context, opts extractStreamOptio
 	return nil
 }
 
+func convertGBKToUTF8(s string) string {
+    decoder := simplifiedchinese.GBK.NewDecoder()
+    utf8Bytes, _ := decoder.Bytes([]byte(s))
+    return string(utf8Bytes)
+}
+
 // ExtractNameFromArchive looks at an archive file to try and determine the name
 // for a given element in an archive. Because of... who knows why, each file type
 // uses different methods to determine the file name.
@@ -267,22 +273,19 @@ func ExtractNameFromArchive(f archiver.File) string {
 		// just try to find the name field in the struct. If it is found return it.
 		field := reflect.Indirect(reflect.ValueOf(sys)).FieldByName("Name")
 		if field.IsValid() {
-			return field.String()
+			str = field.String()
 		}
 		// Fallback to the basename of the file at this point. There is nothing we can really
 		// do to try and figure out what the underlying directory of the file is supposed to
 		// be since it didn't implement a name field.
-		str = f.Name()
 	}
 	isNonUTF8 := false
 	utf8Field := reflect.Indirect(reflect.ValueOf(sys)).FieldByName("NonUTF8")
 	if utf8Field.IsValid() {
 		isNonUTF8 = utf8Field.Bool()
 	}
-	// 转换
 	if isNonUTF8 {
-		utf8Str, _ := simplifiedchinese.GBK.NewDecoder().Bytes([]byte(str))
-		return string(utf8Str)
+		return convertGBKToUTF8(str)
 	} else {
 		return str
 	}
