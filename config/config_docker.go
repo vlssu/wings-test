@@ -26,7 +26,7 @@ type DockerNetworkConfiguration struct {
 	Interface string `default:"172.18.0.1" json:"interface" yaml:"interface"`
 
 	// The DNS settings for containers.
-	Dns []string `default:"[\"1.1.1.1\", \"223.5.5.5\", \"8.8.8.8\", \"114.114.114.114\"]"`
+	Dns []string `default:"[\"223.5.5.5\", \"8.8.8.8\", \"114.114.114.114\"]"`
 
 	// The name of the network to use. If this network already exists it will not
 	// be created. If it is not found, a new network will be created using the interface
