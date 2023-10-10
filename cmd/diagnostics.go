@@ -44,7 +44,7 @@ var diagnosticsArgs struct {
 func newDiagnosticsCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:   "diagnostics",
-		Short: "Collect and report information about this Wings instance to assist in debugging.",
+		Short: "收集并报告有关此 Wings 实例的信息以协助调试。",
 		PreRun: func(cmd *cobra.Command, args []string) {
 			initConfig()
 			log.SetHandler(cli.Default)
@@ -69,17 +69,17 @@ func diagnosticsCmdRun(*cobra.Command, []string) {
 	questions := []*survey.Question{
 		{
 			Name:   "IncludeEndpoints",
-			Prompt: &survey.Confirm{Message: "Do you want to include endpoints (i.e. the FQDN/IP of your panel)?", Default: false},
+			Prompt: &survey.Confirm{Message: "您想要在日志中包含您面板的 FQDN/IP 吗?", Default: false},
 		},
 		{
 			Name:   "IncludeLogs",
-			Prompt: &survey.Confirm{Message: "Do you want to include the latest logs?", Default: true},
+			Prompt: &survey.Confirm{Message: "您想包含最新的日志吗?", Default: true},
 		},
 		{
 			Name: "ReviewBeforeUpload",
 			Prompt: &survey.Confirm{
-				Message: "Do you want to review the collected data before uploading to " + diagnosticsArgs.HastebinURL + "?",
-				Help:    "The data, especially the logs, might contain sensitive information, so you should review it. You will be asked again if you want to upload.",
+				Message: "您想要在上传到 " + diagnosticsArgs.HastebinURL + " 之前，查看收集到的数据吗?",
+				Help:    "数据（尤其是日志）可能包含敏感信息，因此您应该对其进行检查。系统会再次询问您是否要上传。",
 				Default: true,
 			},
 		},
@@ -196,12 +196,12 @@ func diagnosticsCmdRun(*cobra.Command, []string) {
 
 	upload := !diagnosticsArgs.ReviewBeforeUpload
 	if !upload {
-		survey.AskOne(&survey.Confirm{Message: "Upload to " + diagnosticsArgs.HastebinURL + "?", Default: false}, &upload)
+		survey.AskOne(&survey.Confirm{Message: "上传至 " + diagnosticsArgs.HastebinURL + "?", Default: false}, &upload)
 	}
 	if upload {
 		u, err := uploadToHastebin(diagnosticsArgs.HastebinURL, output.String())
 		if err == nil {
-			fmt.Println("Your report is available here: ", u)
+			fmt.Println("您可以在此处获取报告: ", u)
 		}
 	}
 }
