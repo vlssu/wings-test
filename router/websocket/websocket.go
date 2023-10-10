@@ -228,7 +228,7 @@ func (h *Handler) SendErrorJson(msg Message, err error, shouldLog ...bool) error
 
 	wsm := Message{
 		Event: ErrorEvent,
-		Args:  []string{"an unexpected error was encountered while handling this request"},
+		Args:  []string{"处理此请求时遇到意外错误"},
 	}
 
 	if isJWTError || (j != nil && j.HasPermission(PermissionReceiveErrors)) {
@@ -243,7 +243,7 @@ func (h *Handler) SendErrorJson(msg Message, err error, shouldLog ...bool) error
 
 	if !isJWTError && (len(shouldLog) == 0 || (len(shouldLog) == 1 && shouldLog[0] == true)) {
 		h.server.Log().WithFields(log.Fields{"event": msg.Event, "error_identifier": u.String(), "error": err}).
-			Errorf("error processing websocket event \"%s\"", msg.Event)
+			Errorf("处理 websocket 事件时出错 \"%s\"", msg.Event)
 	}
 
 	return h.unsafeSendJson(wsm)
