@@ -37,7 +37,7 @@ func (s *Server) Throttler() *ConsoleThrottle {
 
 		s.throttler = newConsoleThrottle(throttles.Lines, period)
 		s.throttler.strike = func() {
-			s.PublishConsoleOutputFromDaemon("Server is outputting console data too quickly -- throttling...")
+			s.PublishConsoleOutputFromDaemon("服务器输出控制台数据的速度太快——正在限制...")
 		}
 	})
 	return s.throttler
