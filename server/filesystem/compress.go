@@ -23,6 +23,9 @@ import (
 // 定义 convertToUTF8 函数
 func convertToUTF8(s []byte) ([]byte, error) {
 	decoder, err := htmlindex.Get("gbk").NewDecoder()
+	if err != nil {
+		return nil, err
+	}
 
 	reader := transform.NewReader(bytes.NewReader(s), decoder)
 	return io.ReadAll(reader)
@@ -205,6 +208,7 @@ func (fs *Filesystem) ExtractStreamUnsafe(ctx context.Context, dir string, r io.
 			if err != nil {
 				return err
 			}
+			_ = utf8Name // Use utf8Name or remove the declaration if not needed.
 
 			r, err := f.Open()
 			if err != nil {
