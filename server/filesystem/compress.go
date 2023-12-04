@@ -28,7 +28,11 @@ func convertToUTF8(s []byte) ([]byte, error) {
 	}
 
 	reader := transform.NewReader(bytes.NewReader(s), decoder)
-	return io.ReadAll(reader)
+	utf8Bytes, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
+	return utf8Bytes, nil
 }
 
 // CompressFiles compresses all the files matching the given paths in the
@@ -208,7 +212,6 @@ func (fs *Filesystem) ExtractStreamUnsafe(ctx context.Context, dir string, r io.
 			if err != nil {
 				return err
 			}
-			_ = utf8Name // Use utf8Name or remove the declaration if not needed.
 
 			r, err := f.Open()
 			if err != nil {
