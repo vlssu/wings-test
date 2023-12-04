@@ -16,16 +16,16 @@ import (
 	"github.com/mholt/archiver/v4"
 
 	"bytes"
-    "golang.org/x/text/transform"
+	"golang.org/x/text/transform"
 	"golang.org/x/text/encoding/htmlindex"
 )
 
 // 定义 convertToUTF8 函数
 func convertToUTF8(s []byte) ([]byte, error) {
-    decoder, err := htmlindex.Get("gbk").NewDecoder()
+	decoder, err := htmlindex.Get("gbk").NewDecoder()
 
-    reader := transform.NewReader(bytes.NewReader(s), decoder)
-    return io.ReadAll(reader)
+	reader := transform.NewReader(bytes.NewReader(s), decoder)
+	return io.ReadAll(reader)
 }
 
 // CompressFiles compresses all the files matching the given paths in the
@@ -182,11 +182,51 @@ func (fs *Filesystem) ExtractStreamUnsafe(ctx context.Context, dir string, r io.
 		return err
 	}
 
-	return fs.extractStream(ctx, extractStreamOptions{
+	opts := extractStreamOptions{
 		Directory: dir,
 		Format:    format,
 		Reader:    input,
-	})
+	}
+
+	// Decompress and extract archive
+	if ex, ok := opts.Format.(archiver.Extractor); ok {
+		return ex.Extract(ctx, opts.Reader, nil, func(ctx context.Context, f archiver.File) error {
+			if f.IsDir() {
+				return nil
+			}
+			p := filepath.Join(opts.Directory, f.NameInArchive)
+			// If it is ignored, just don't do anything with the file and skip over it.
+			if err := fs.IsIgnored(p); err != nil {
+				return nil
+			}
+
+			// Convert file name to UTF-8
+			utf8Name, err := convertToUTF8([]byte(f.NameInArchive))
+			if err != nil {
+				return err
+			}
+
+			r, err := f.Open()
+			if err != nil {
+				return err
+			}
+			defer r.Close()
+
+			if err := fs.Writefile(p, r); err != nil {
+				return wrapError(err, opts.FileName)
+			}
+			// Update the file permissions to the one set in the archive.
+			if err := fs.Chmod(p, f.Mode()); err != nil {
+				return wrapError(err, opts.FileName)
+			}
+			// Update the file modification time to the one set in the archive.
+			if err := fs.Chtimes(p, f.ModTime(), f.ModTime()); err != nil {
+				return wrapError(err, opts.FileName)
+			}
+			return nil
+		})
+	}
+	return nil
 }
 
 type extractStreamOptions struct {
@@ -232,41 +272,4 @@ func (fs *Filesystem) extractStream(ctx context.Context, opts extractStreamOptio
 		})
 	}
 	return nil
-}
-
-if ex, ok := opts.Format.(archiver.Extractor); ok {
-    return ex.Extract(ctx, opts.Reader, nil, func(ctx context.Context, f archiver.File) error {
-        if f.IsDir() {
-            return nil
-        }
-        p := filepath.Join(opts.Directory, f.NameInArchive)
-
-        // Convert file name to UTF-8
-        utf8Name, err := convertToUTF8([]byte(f.NameInArchive))
-        if err != nil {
-            return err
-        }
-
-        // If it is ignored, just don't do anything with the file and skip over it.
-        if err := fs.IsIgnored(p); err != nil {
-            return nil
-        }
-        r, err := f.Open()
-        if err != nil {
-            return err
-        }
-        defer r.Close()
-        if err := fs.Writefile(p, r); err != nil {
-            return wrapError(err, opts.FileName)
-        }
-        // Update the file permissions to the one set in the archive.
-        if err := fs.Chmod(p, f.Mode()); err != nil {
-            return wrapError(err, opts.FileName)
-        }
-        // Update the file modification time to the one set in the archive.
-        if err := fs.Chtimes(p, f.ModTime(), f.ModTime()); err != nil {
-            return wrapError(err, opts.FileName)
-        }
-        return nil
-    })
 }
