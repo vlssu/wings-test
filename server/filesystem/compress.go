@@ -212,6 +212,7 @@ func (fs *Filesystem) ExtractStreamUnsafe(ctx context.Context, dir string, r io.
 			if err != nil {
 				return err
 			}
+			_ = utf8Name // Fix: Added this line to avoid the "declared and not used" error.
 
 			r, err := f.Open()
 			if err != nil {
