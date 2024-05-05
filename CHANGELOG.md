@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.11.12
+
+### Fixed
+* Arbitrary File Write/Read ([GHSA-gqmf-jqgv-v8fw](https://github.com/pterodactyl/wings/security/advisories/GHSA-gqmf-jqgv-v8fw))
+* Server-side Request Forgery (SSRF) during remote file pull ([GHSA-qq22-jj8x-4wwv](https://github.com/pterodactyl/wings/security/advisories/GHSA-qq22-jj8x-4wwv))
+* Invalid `Content-Type` being used with the `wings diagnostics` command ([#186](https://github.com/pterodactyl/wings/pull/186))
+
 ## v1.11.11
 ### Fixed
 * Backups missing content when a `.pteroignore` file is used
