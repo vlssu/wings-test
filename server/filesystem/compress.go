@@ -15,6 +15,9 @@ import (
 	"github.com/klauspost/compress/zip"
 	"github.com/mholt/archiver/v4"
 
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
+
 	"github.com/pterodactyl/wings/internal/ufs"
 	"github.com/pterodactyl/wings/server/filesystem/archiverext"
 )
@@ -191,22 +194,19 @@ type extractStreamOptions struct {
 }
 
 func (fs *Filesystem) extractStream(ctx context.Context, opts extractStreamOptions) error {
-
 	// See if it's a compressed archive, such as TAR or a ZIP
 	ex, ok := opts.Format.(archiver.Extractor)
 	if !ok {
-
-		// If not, check if it's a single-file compression, such as
-		// .log.gz, .sql.gz, and so on
+		// 如果不是压缩包，则检查是否是单个文件压缩，比如 .log.gz、.sql.gz 等
 		de, ok := opts.Format.(archiver.Decompressor)
 		if !ok {
 			return nil
 		}
 
-		// Strip the compression suffix
+		// 去掉压缩后缀
 		p := filepath.Join(opts.Directory, strings.TrimSuffix(opts.FileName, opts.Format.Name()))
 
-		// Make sure it's not ignored
+		// 确保不被忽略
 		if err := fs.IsIgnored(p); err != nil {
 			return nil
 		}
@@ -217,40 +217,39 @@ func (fs *Filesystem) extractStream(ctx context.Context, opts extractStreamOptio
 		}
 		defer reader.Close()
 
-		// Open the file for creation/writing
+		// 打开文件进行创建/写入
 		f, err := fs.unixFS.OpenFile(p, ufs.O_WRONLY|ufs.O_CREATE, 0o644)
 		if err != nil {
 			return err
 		}
 		defer f.Close()
 
-		// Read in 4 KB chunks
+		// 以 4KB 分块读取
 		buf := make([]byte, 4096)
 		for {
 			n, err := reader.Read(buf)
 			if n > 0 {
-
-				// Check quota before writing the chunk
+				// 写入前检查配额
 				if quotaErr := fs.HasSpaceFor(int64(n)); quotaErr != nil {
 					return quotaErr
 				}
 
-				// Write the chunk
+				// 写入分块
 				if _, writeErr := f.Write(buf[:n]); writeErr != nil {
 					return writeErr
 				}
 
-				// Add to quota
+				// 添加到配额
 				fs.addDisk(int64(n))
 			}
 
 			if err != nil {
-				// EOF are expected
+				// 预期的 EOF
 				if err == io.EOF {
 					break
 				}
 
-				// Return any other
+				// 返回任何其他错误
 				return err
 			}
 		}
@@ -258,13 +257,13 @@ func (fs *Filesystem) extractStream(ctx context.Context, opts extractStreamOptio
 		return nil
 	}
 
-	// Decompress and extract archive
+	// 解压缩并提取归档文件
 	return ex.Extract(ctx, opts.Reader, nil, func(ctx context.Context, f archiver.File) error {
 		if f.IsDir() {
 			return nil
 		}
 		p := filepath.Join(opts.Directory, f.NameInArchive)
-		// If it is ignored, just don't do anything with the file and skip over it.
+		// 如果被忽略，不处理该文件并跳过
 		if err := fs.IsIgnored(p); err != nil {
 			return nil
 		}
@@ -273,13 +272,28 @@ func (fs *Filesystem) extractStream(ctx context.Context, opts extractStreamOptio
 			return err
 		}
 		defer r.Close()
-		if err := fs.Write(p, r, f.Size(), f.Mode()); err != nil {
+		// 处理中文文件名
+		filePath, err := decodeGBK(p)
+		if err != nil {
+			return err
+		}
+		if err := fs.Write(filePath, r, f.Size(), f.Mode()); err != nil {
 			return wrapError(err, opts.FileName)
 		}
-		// Update the file modification time to the one set in the archive.
-		if err := fs.Chtimes(p, f.ModTime(), f.ModTime()); err != nil {
+		// 更新文件修改时间为归档中设置的时间
+		if err := fs.Chtimes(filePath, f.ModTime(), f.ModTime()); err != nil {
 			return wrapError(err, opts.FileName)
 		}
 		return nil
 	})
+}
+
+// 解码GBK编码的文件名
+func decodeGBK(input string) (string, error) {
+	decoder := simplifiedchinese.GBK.NewDecoder()
+	decoded, _, err := transform.String(decoder, input)
+	if err != nil {
+		return "", err
+	}
+	return decoded, nil
 }
