@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.11.13
+
+### Fixed
+
+* Auto-configure not working ([#5087](https://github.com/pterodactyl/panel/issues/5087))
+* Individual files unable to be decompressed ([#5034](https://github.com/pterodactyl/panel/issues/5034))
+
 ## v1.11.12
 
 ### Fixed
